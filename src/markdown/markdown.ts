@@ -1,0 +1,1 @@
+export const markdownWithoutPreview: object = { parse_mode: 'MarkdownV2', disable_web_page_preview: true };
