@@ -21,3 +21,11 @@ export const markdownWithMainButtons: object =  {
     parse_mode: 'MarkdownV2',
     disable_web_page_preview: true
   };
+
+  export const clearButtons: object =  {
+    reply_markup: {
+      ketboard: {}
+    },
+    parse_mode: 'MarkdownV2',
+    disable_web_page_preview: true
+  };

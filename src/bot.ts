@@ -38,6 +38,9 @@ bot.use(session({ initial: (): SessionData => ({ step: "idle" }) }));
 
 
 bot.command("start", async (ctx) => {
+    if (ctx.update.message?.chat.id == Number(process.env.SUPPORT_CHATID)) {
+    bot.api.sendMessage(Number(process.env.SUPPORT_CHATID), 'Михан не трогай');
+     } else {
     const userDB = await getUser(ctx.update.message?.from.id || 0);
     if (!userDB) {
     ctx.session.step = "register";
@@ -46,6 +49,7 @@ bot.command("start", async (ctx) => {
         ctx.session.step = "signed";
         ctx.reply(returnMessage, markdownWithMainButtons);
     }
+}
 });
 
 const router = new Router<MyContext>((ctx) => ctx.session.step);
@@ -85,8 +89,10 @@ bot.hears(/Выйти из чата ❌/, async (ctx) => {
 
 router.route("support", async (ctx) => {
     console.log(ctx);
-    await bot.api.sendMessage(Number(process.env.SUPPORT_CHATID), newQuestion)
-    await bot.api.forwardMessage(Number(process.env.SUPPORT_CHATID), ctx.update.message?.chat.id || 0, ctx.update.message?.message_id || 0);
+    await bot.api.sendMessage(Number(process.env.SUPPORT_CHATID), `${ctx.msg?.from?.id}, ${ctx.msg?.from?.first_name}${newQuestion}
+
+${ctx.msg?.text}`)
+    //await bot.api.forwardMessage(Number(process.env.SUPPORT_CHATID), ctx.update.message?.from?.id || 0, ctx.update.message?.message_id || 0);
     await ctx.reply(supportSend);
 });
 
@@ -101,12 +107,14 @@ bot.use(router);
 
 bot.on('message', async (ctx) => {
     if (ctx.update.message.chat.id == Number(process.env.SUPPORT_CHATID)) {
+    const split = ctx.msg.reply_to_message?.text?.split(',') || '';
     try {
-    await bot.api.sendMessage(ctx.update.message.reply_to_message?.forward_from?.id || 0, `*Ответ от шопа*
+    await bot.api.sendMessage(Number(split[0]) || 0, `Ответ от шопа!
 
-    ${ctx.update.message.text}`, markdownWithoutPreview);
+${ctx.update.message.text}`,);
     await bot.api.sendMessage(Number(process.env.SUPPORT_CHATID), supportSuccess , markdownWithoutPreview);
      } catch (e) {
+    console.log(e);
     await bot.api.sendMessage(Number(process.env.SUPPORT_CHATID), supportError);
      }
 }

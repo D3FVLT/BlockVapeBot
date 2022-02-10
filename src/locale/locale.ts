@@ -16,7 +16,7 @@ export const rightCode = `Красава\\!
 export const returnMessage = `Вернулся\\?
 Нажимай кнопки 😎`;
 
-export const newQuestion = `*Новый вопрос!*`;
+export const newQuestion = `, задал новый вопрос!`;
 
 export const supportState = `Напиши мне что хочешь узнать и я отправлю это пацанам`;
 
