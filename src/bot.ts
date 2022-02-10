@@ -3,7 +3,7 @@ import "reflect-metadata";
 import { Bot, Context, session, SessionFlavor } from "grammy";
 import { Router } from "@grammyjs/router";
 
-import { foundMessage, newQuestion, notFoundMessage, profileMessage, returnMessage, rightCode, supportSend, supportState, welcomeMessage, wrongCode } from "./locale/locale";
+import { foundMessage, newQuestion, notFoundMessage, profileMessage, returnMessage, rightCode, supportError, supportSend, supportState, supportSuccess, welcomeMessage, wrongCode } from "./locale/locale";
 import { cancelButton, markdownWithMainButtons, markdownWithoutPreview } from "./markdown/markdown";
 import { getUser } from "./db/getters";
 import { getDiscountCards } from "./controllers/businessController";
@@ -101,9 +101,9 @@ bot.on('message', async (ctx) => {
     await bot.api.sendMessage(ctx.update.message.reply_to_message?.forward_from?.id || 0, `*Ответ от шопа*
 
     ${ctx.update.message.text}`, markdownWithoutPreview);
-    await bot.api.sendMessage(Number(process.env.SUPPORT_CHATID), `*Сообщение отправлено\\!* ✅`, markdownWithoutPreview);
+    await bot.api.sendMessage(Number(process.env.SUPPORT_CHATID), supportSuccess , markdownWithoutPreview);
      } catch (e) {
-    await bot.api.sendMessage(Number(process.env.SUPPORT_CHATID), `Сообщение не отправлено, возможно пользователь заблокировал бота`);
+    await bot.api.sendMessage(Number(process.env.SUPPORT_CHATID), supportError);
      }
 }
 })
