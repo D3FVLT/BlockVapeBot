@@ -14,7 +14,7 @@ export const markdownWithMainButtons: object =  {
   export const cancelButton: object =  {
     reply_markup: {
       keyboard: [
-        ['Вернуться назад ❌'],
+        ['Выйти из чата ❌'],
       ],
       resize_keyboard: true,
     },

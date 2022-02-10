@@ -78,12 +78,16 @@ bot.hears(/Написать в шоп 🤫/, async (ctx) => {
     ctx.reply(supportState, cancelButton);
 });
 
+bot.hears(/Выйти из чата ❌/, async (ctx) => {
+    ctx.session.step = "signed";
+    ctx.reply(returnMessage, markdownWithMainButtons);
+});
+
 router.route("support", async (ctx) => {
     console.log(ctx);
-    ctx.session.step = "signed";
     await bot.api.sendMessage(Number(process.env.SUPPORT_CHATID), newQuestion)
     await bot.api.forwardMessage(Number(process.env.SUPPORT_CHATID), ctx.update.message?.chat.id || 0, ctx.update.message?.message_id || 0);
-    await ctx.reply(supportSend, markdownWithMainButtons);
+    await ctx.reply(supportSend);
 });
 
 bot.hears(/Мой Профиль 👽/, async (ctx) => {

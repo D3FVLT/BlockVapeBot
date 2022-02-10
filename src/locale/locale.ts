@@ -22,6 +22,10 @@ export const supportState = `Напиши мне что хочешь узнат�
 
 export const supportSend = `Отправил сообщение, ответ придет сюда`;
 
+export const supportError = `Сообщение не отправлено, возможно пользователь заблокировал бота`;
+
+export const supportSuccess = `*Сообщение отправлено\\!* ✅`;
+
 export async function profileMessage(phone_number: string, points: string) {
     const message = `Йоу!
 Твой номер телефона: ${phone_number}
