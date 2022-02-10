@@ -1,14 +1,12 @@
-import { Bot } from "grammy";
-import { welcomeMessage } from "./locale/locale";
-import { markdownWithoutPreview } from "./markdown/markdown";
+import { createConnection } from 'typeorm';
 
-if (!process.env.BOT_TOKEN) {
-    console.error('Bot token is not defined');
-    process.exit();
-}
+import { start } from './bot';
 
-const bot = new Bot(process.env.BOT_TOKEN);
-
-bot.command("start", (ctx) => ctx.reply(welcomeMessage, markdownWithoutPreview));
-
-bot.start();
+createConnection()
+  .then(async () => {
+    console.log('Connected...');
+    return start();
+  })
+  .catch(e => {
+    console.error(e);
+  });
