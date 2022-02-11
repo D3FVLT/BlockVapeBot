@@ -98,9 +98,13 @@ ${ctx.msg?.text}`)
 
 bot.hears(/Мой Профиль 👽/, async (ctx) => {
     const user = await getUser(ctx.update.message?.from.id || 0);
+    try {
     const profile = await getDiscountCards(Number(user?.phone_number));
     const message = await profileMessage(user?.phone_number || '', profile[0].bonus_sum)
     await ctx.reply(message);
+    } catch (e) {
+    await ctx.reply('Возникла непредвиденная ошибка');    
+    }
 });
 
 bot.use(router);
