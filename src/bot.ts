@@ -108,11 +108,12 @@ export function start() {
     let message;
     try {
       if (ctx.msg?.photo) {
-        message =
-          ctx.msg?.photo[2].file_id || ctx.msg?.photo[1].file_id || ctx.msg?.photo[0].file_id;
+        const reverse = ctx.msg.photo.reverse();
+        message = reverse[0].file_id;
+        console.log(message);
         await bot.api.sendPhoto(Number(process.env.SUPPORT_CHATID), `${message}`, {
           caption: `${ctx.msg?.from?.id}, ${ctx.msg?.from?.first_name}${newQuestion}
-${ctx.msg?.caption}`,
+${ctx.msg?.caption || ''}`,
         });
         await ctx.reply(supportSend);
       } else if (ctx.msg?.text) {
@@ -128,6 +129,7 @@ ${message}`,
         await ctx.reply(`Ты вообще все сломал чел, давай заново, отправь фото или текст`);
       }
     } catch (e) {
+      console.log(e);
       await ctx.reply(
         `Ты ВООБЩЕ ВСЕ сломал чел, давай заново, отправь фото или текст`,
         markdownWithMainButtons,
@@ -158,11 +160,11 @@ ${message}`,
           ctx.msg.reply_to_message?.caption?.split(',') ||
           '';
         if (ctx.msg.photo) {
-          message =
-            ctx.msg?.photo[2].file_id || ctx.msg?.photo[1].file_id || ctx.msg?.photo[0].file_id;
+          const reverse = ctx.msg.photo.reverse();
+          message = reverse[0].file_id;
           await bot.api.sendPhoto(Number(split[0]), `${message}`, {
             caption: `Ответ от шопа!
-${ctx.msg?.caption}`,
+${ctx.msg?.caption || ''}`,
           });
           await bot.api.sendMessage(
             Number(process.env.SUPPORT_CHATID),
