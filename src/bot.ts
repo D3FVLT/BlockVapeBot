@@ -20,7 +20,7 @@ import {
 import { cancelButton, markdownWithMainButtons, markdownWithoutPreview } from './markdown/markdown';
 import { getUser } from './db/getters';
 import { getDiscountCards } from './controllers/businessController';
-import { sendSMS } from './controllers/verificationcontroller';
+import { sendSMS } from './controllers/verificationController';
 import { setUser } from './db/setters';
 
 export function start() {

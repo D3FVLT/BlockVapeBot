@@ -1,15 +1,13 @@
-import {Entity, PrimaryColumn, Column} from "typeorm";
+import { Entity, PrimaryColumn, Column } from 'typeorm';
 
 @Entity()
 export class User {
+  @PrimaryColumn({ unique: true })
+  tg_id: string;
 
-    @PrimaryColumn({ unique: true })
-    tg_id: string;
+  @Column()
+  firstName: string;
 
-    @Column()
-    firstName: string;
-
-    @Column()
-    phone_number: string;
-
+  @Column()
+  phone_number: string;
 }
