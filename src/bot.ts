@@ -20,7 +20,7 @@ import {
 import { cancelButton, markdownWithMainButtons, markdownWithoutPreview } from './markdown/markdown';
 import { getUser } from './db/getters';
 import { getDiscountCards } from './controllers/businessController';
-import { sendSMS } from './controllers/verificationcontroller';
+import { sendSMS } from './controllers/verificationController';
 import { setUser } from './db/setters';
 
 export function start() {
@@ -66,6 +66,17 @@ export function start() {
   });
 
   const router = new Router<MyContext>(ctx => ctx.session.step);
+
+  router.route('idle', async ctx => {
+    const userDB = await getUser(ctx.msg?.from?.id || 0);
+    if (!userDB) {
+      ctx.session.step = 'register';
+      await ctx.reply(welcomeMessage, markdownWithoutPreview);
+    } else {
+      ctx.session.step = 'signed';
+      await ctx.reply(returnMessage, markdownWithMainButtons);
+    }
+  });
 
   router.route('register', async ctx => {
     const card = await getDiscountCards(Number(ctx.update.message?.text) || 0);
