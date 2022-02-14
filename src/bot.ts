@@ -14,6 +14,7 @@ import {
   supportSend,
   supportState,
   supportSuccess,
+  wakeUp,
   welcomeMessage,
   wrongCode,
 } from './locale/locale';
@@ -71,7 +72,9 @@ export function start() {
     const userDB = await getUser(ctx.msg?.from?.id || 0);
     if (!userDB) {
       ctx.session.step = 'register';
-      await ctx.reply(welcomeMessage, markdownWithoutPreview);
+      await ctx.reply(wakeUp, markdownWithoutPreview);
+      setTimeout(() => ctx.reply(welcomeMessage, markdownWithoutPreview), 1000);
+      //await ctx.reply(welcomeMessage, markdownWithoutPreview);
     } else {
       ctx.session.step = 'signed';
       await ctx.reply(returnMessage, markdownWithMainButtons);

@@ -26,6 +26,8 @@ export const supportError = `Сообщение не отправлено, во�
 
 export const supportSuccess = `*Сообщение отправлено\\!* ✅`;
 
+export const wakeUp = `Уххх.. сколько я спал? ладно, проехали`;
+
 export async function profileMessage(phone_number: string, points: string) {
   const message = `Йоу!
 Твой номер телефона: ${phone_number}
