@@ -134,7 +134,7 @@ ${ctx.msg?.caption || ''}`,
         message = ctx.msg.text;
         await bot.api.sendMessage(
           Number(process.env.SUPPORT_CHATID),
-          `${ctx.msg?.from?.id}, ${ctx.msg?.from?.first_name} ${newQuestion}
+          `${ctx.msg?.from?.id}, ${ctx.msg?.from?.first_name}${newQuestion}
 
 ${message}`,
         );
