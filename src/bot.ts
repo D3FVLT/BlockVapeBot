@@ -196,6 +196,7 @@ ${message}`,
   bot.use(router);
 
   bot.on('message', async ctx => {
+    console.log(ctx.update);
     if (ctx.update.message.chat.id == Number(process.env.SUPPORT_CHATID)) {
       let message;
       try {
