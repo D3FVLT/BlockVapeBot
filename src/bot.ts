@@ -66,6 +66,15 @@ export function start() {
     }
   });
 
+  bot.command('rmmenu', async ctx => {
+    ctx.session.step = 'idle';
+    await ctx.reply(`Меню удалено!`, {
+      reply_markup: {
+        remove_keyboard: true,
+      },
+    });
+  });
+
   const router = new Router<MyContext>(ctx => ctx.session.step);
 
   router.route('idle', async ctx => {
