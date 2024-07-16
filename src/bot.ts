@@ -52,10 +52,10 @@ export function start() {
   bot.use(session({ initial: (): SessionData => ({ step: 'idle' }) }));
 
   bot.command('start', async ctx => {
-    if (ctx.update.message?.chat.id == Number(process.env.SUPPORT_CHATID)) {
+    if (ctx.message?.chat.id == Number(process.env.SUPPORT_CHATID)) {
       await bot.api.sendMessage(Number(process.env.SUPPORT_CHATID), 'Михан не трогай');
     } else {
-      const userDB = await getUser(ctx.update.message?.from.id || 0);
+      const userDB = await getUser(ctx.message?.from?.id || 0);
       if (!userDB) {
         ctx.session.step = 'register';
         await ctx.reply(welcomeMessage, markdownWithoutPreview);
@@ -78,15 +78,14 @@ export function start() {
   const router = new Router<MyContext>(ctx => ctx.session.step);
 
   router.route('idle', async ctx => {
-    if (ctx.update.message && ctx.update.message.chat.id === Number(process.env.SUPPORT_CHATID)) {
+    if (ctx.message && ctx.message.chat.id === Number(process.env.SUPPORT_CHATID)) {
       return;
     }
-    const userDB = await getUser(ctx.msg?.from?.id || 0);
+    const userDB = await getUser(ctx.message?.from?.id || 0);
     if (!userDB) {
       ctx.session.step = 'register';
       await ctx.reply(wakeUp, markdownWithoutPreview);
       setTimeout(() => ctx.reply(welcomeMessage, markdownWithoutPreview), 1000);
-      //await ctx.reply(welcomeMessage, markdownWithoutPreview);
     } else {
       ctx.session.step = 'signed';
       await ctx.reply(returnMessage, markdownWithMainButtons);
@@ -94,29 +93,29 @@ export function start() {
   });
 
   router.route('register', async ctx => {
-    if (ctx.update.message && ctx.update.message.chat.id === Number(process.env.SUPPORT_CHATID)) {
+    if (ctx.message && ctx.message.chat.id === Number(process.env.SUPPORT_CHATID)) {
       return;
     }
-    const card = await getDiscountCards(Number(ctx.update.message?.text) || 0);
+    const card = await getDiscountCards(Number(ctx.message?.text) || 0);
     if (!card.length) {
       await ctx.reply(notFoundMessage);
     } else {
       ctx.session.step = 'phoneVerification';
-      ctx.session.phone_number = Number(ctx.update.message?.text);
+      ctx.session.phone_number = Number(ctx.message?.text);
       ctx.session.verification_code = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
-      await sendSMS(ctx.session.verification_code, Number(ctx.update.message?.text));
+      await sendSMS(ctx.session.verification_code, Number(ctx.message?.text));
       await ctx.reply(foundMessage);
     }
   });
 
   router.route('phoneVerification', async ctx => {
-    if (ctx.update.message && ctx.update.message.chat.id === Number(process.env.SUPPORT_CHATID)) {
+    if (ctx.message && ctx.message.chat.id === Number(process.env.SUPPORT_CHATID)) {
       return;
     }
-    if (Number(ctx.update.message?.text) === ctx.session.verification_code) {
+    if (Number(ctx.message?.text) === ctx.session.verification_code) {
       await setUser(
-        ctx.update.message?.from?.id.toString() || '',
-        ctx.update.message?.from?.first_name || '',
+        ctx.message?.from?.id.toString() || '',
+        ctx.message?.from?.first_name || '',
         ctx.session.phone_number?.toString() || '',
       );
       await ctx.reply(rightCode, markdownWithMainButtons);
@@ -127,7 +126,7 @@ export function start() {
   });
 
   bot.hears(/Написать в шоп 🤫/, async ctx => {
-    if (ctx.update.message && ctx.update.message.chat.id === Number(process.env.SUPPORT_CHATID)) {
+    if (ctx.message && ctx.message.chat.id === Number(process.env.SUPPORT_CHATID)) {
       return;
     }
     ctx.session.step = 'support';
@@ -135,7 +134,7 @@ export function start() {
   });
 
   bot.hears(/Выйти из чата ❌/, async ctx => {
-    if (ctx.update.message && ctx.update.message.chat.id === Number(process.env.SUPPORT_CHATID)) {
+    if (ctx.message && ctx.message.chat.id === Number(process.env.SUPPORT_CHATID)) {
       return;
     }
     ctx.session.step = 'signed';
@@ -143,25 +142,25 @@ export function start() {
   });
 
   router.route('support', async ctx => {
-    if (ctx.update.message && ctx.update.message.chat.id === Number(process.env.SUPPORT_CHATID)) {
+    if (ctx.message && ctx.message.chat.id === Number(process.env.SUPPORT_CHATID)) {
       return;
     }
     let message;
     try {
-      if (ctx.msg?.photo) {
-        const reverse = ctx.msg.photo.reverse();
+      if (ctx.message?.photo) {
+        const reverse = ctx.message.photo.reverse();
         message = reverse[0].file_id;
         console.log(message);
         await bot.api.sendPhoto(Number(process.env.SUPPORT_CHATID), `${message}`, {
-          caption: `${ctx.msg?.from?.id}, ${ctx.msg?.from?.first_name}${newQuestion}
-${ctx.msg?.caption || ''}`,
+          caption: `${ctx.message?.from?.id}, ${ctx.message?.from?.first_name}${newQuestion}
+${ctx.message?.caption || ''}`,
         });
         await ctx.reply(supportSend);
-      } else if (ctx.msg?.text) {
-        message = ctx.msg.text;
+      } else if (ctx.message?.text) {
+        message = ctx.message.text;
         await bot.api.sendMessage(
           Number(process.env.SUPPORT_CHATID),
-          `${ctx.msg?.from?.id}, ${ctx.msg?.from?.first_name}${newQuestion}
+          `${ctx.message?.from?.id}, ${ctx.message?.from?.first_name}${newQuestion}
 
 ${message}`,
         );
@@ -180,10 +179,10 @@ ${message}`,
   });
 
   bot.hears(/Мой Профиль 👽/, async ctx => {
-    if (ctx.update.message && ctx.update.message.chat.id === Number(process.env.SUPPORT_CHATID)) {
+    if (ctx.message && ctx.message.chat.id === Number(process.env.SUPPORT_CHATID)) {
       return;
     }
-    const user = await getUser(ctx.update.message?.from.id || 0);
+    const user = await getUser(ctx.message?.from.id || 0);
     try {
       const profile = await getDiscountCards(Number(user?.phone_number));
       const message = await profileMessage(user?.phone_number || '', profile[0].bonus_sum);
@@ -194,6 +193,8 @@ ${message}`,
   });
 
   bot.use(router);
+
+  // Обработка сообщений
   bot.on('message', async ctx => {
     try {
       console.log('Received message:', ctx.message);
@@ -250,6 +251,8 @@ ${message}`,
       await bot.api.sendMessage(Number(process.env.SUPPORT_CHATID), supportError);
     }
   });
+
+  // Запуск бота
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   bot.start();
 }
