@@ -78,6 +78,9 @@ export function start() {
   const router = new Router<MyContext>(ctx => ctx.session.step);
 
   router.route('idle', async ctx => {
+    if (ctx.update.message && ctx.update.message.chat.id === Number(process.env.SUPPORT_CHATID)) {
+      return;
+    }
     const userDB = await getUser(ctx.msg?.from?.id || 0);
     if (!userDB) {
       ctx.session.step = 'register';
@@ -91,6 +94,9 @@ export function start() {
   });
 
   router.route('register', async ctx => {
+    if (ctx.update.message && ctx.update.message.chat.id === Number(process.env.SUPPORT_CHATID)) {
+      return;
+    }
     const card = await getDiscountCards(Number(ctx.update.message?.text) || 0);
     if (!card.length) {
       await ctx.reply(notFoundMessage);
@@ -104,6 +110,9 @@ export function start() {
   });
 
   router.route('phoneVerification', async ctx => {
+    if (ctx.update.message && ctx.update.message.chat.id === Number(process.env.SUPPORT_CHATID)) {
+      return;
+    }
     if (Number(ctx.update.message?.text) === ctx.session.verification_code) {
       await setUser(
         ctx.update.message?.from?.id.toString() || '',
@@ -118,16 +127,25 @@ export function start() {
   });
 
   bot.hears(/Написать в шоп 🤫/, async ctx => {
+    if (ctx.update.message && ctx.update.message.chat.id === Number(process.env.SUPPORT_CHATID)) {
+      return;
+    }
     ctx.session.step = 'support';
     await ctx.reply(supportState, cancelButton);
   });
 
   bot.hears(/Выйти из чата ❌/, async ctx => {
+    if (ctx.update.message && ctx.update.message.chat.id === Number(process.env.SUPPORT_CHATID)) {
+      return;
+    }
     ctx.session.step = 'signed';
     await ctx.reply(returnMessage, markdownWithMainButtons);
   });
 
   router.route('support', async ctx => {
+    if (ctx.update.message && ctx.update.message.chat.id === Number(process.env.SUPPORT_CHATID)) {
+      return;
+    }
     let message;
     try {
       if (ctx.msg?.photo) {
@@ -162,6 +180,9 @@ ${message}`,
   });
 
   bot.hears(/Мой Профиль 👽/, async ctx => {
+    if (ctx.update.message && ctx.update.message.chat.id === Number(process.env.SUPPORT_CHATID)) {
+      return;
+    }
     const user = await getUser(ctx.update.message?.from.id || 0);
     try {
       const profile = await getDiscountCards(Number(user?.phone_number));
