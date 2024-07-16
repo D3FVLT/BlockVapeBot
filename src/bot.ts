@@ -194,55 +194,62 @@ ${message}`,
   });
 
   bot.use(router);
-
   bot.on('message', async ctx => {
-    console.log(ctx);
-    if (ctx.update.message.chat.id == Number(process.env.SUPPORT_CHATID)) {
-      let message;
-      try {
-        const split =
-          ctx.msg.reply_to_message?.text?.split(',') ||
-          ctx.msg.reply_to_message?.caption?.split(',') ||
-          '';
-        if (ctx.msg.photo) {
-          const reverse = ctx.msg.photo.reverse();
-          message = reverse[0].file_id;
-          await bot.api.sendPhoto(Number(split[0]), `${message}`, {
-            caption: `Ответ от шопа!
-${ctx.msg?.caption || ''}`,
-          });
-          await bot.api.sendMessage(
-            Number(process.env.SUPPORT_CHATID),
-            supportSuccess,
-            markdownWithoutPreview,
-          );
-        } else if (ctx.msg.text) {
-          message = ctx.msg.text;
-          await bot.api.sendMessage(
-            Number(split[0]) || 0,
-            `Ответ от шопа!
-    
-${message}`,
-          );
-          await bot.api.sendMessage(
-            Number(process.env.SUPPORT_CHATID),
-            supportSuccess,
-            markdownWithoutPreview,
-          );
+    try {
+      console.log('Received message:', ctx.message);
+
+      // Проверка ID чата
+      if (ctx.message.chat.id == Number(process.env.SUPPORT_CHATID)) {
+        console.log('Message is in the support chat.');
+
+        let message;
+        const replyMessage = ctx.message.reply_to_message;
+
+        if (replyMessage) {
+          const split = replyMessage.text?.split(',') || replyMessage.caption?.split(',') || '';
+          console.log('Reply message split:', split);
+
+          // Обработка фото
+          if (ctx.message.photo) {
+            const reverse = ctx.message.photo.reverse();
+            message = reverse[0].file_id;
+            await bot.api.sendPhoto(Number(split[0]), `${message}`, {
+              caption: `Ответ от шопа!\n${ctx.message.caption || ''}`,
+            });
+            await bot.api.sendMessage(
+              Number(process.env.SUPPORT_CHATID),
+              supportSuccess,
+              markdownWithoutPreview,
+            );
+          }
+          // Обработка текста
+          else if (ctx.message.text) {
+            message = ctx.message.text;
+            await bot.api.sendMessage(Number(split[0]) || 0, `Ответ от шопа!\n\n${message}`);
+            await bot.api.sendMessage(
+              Number(process.env.SUPPORT_CHATID),
+              supportSuccess,
+              markdownWithoutPreview,
+            );
+          }
+          // Обработка других типов сообщений
+          else {
+            await bot.api.sendMessage(
+              Number(process.env.SUPPORT_CHATID),
+              'Возникла ошибка свзяанная с типом файла, вы можете отправить текст либо фото.',
+            );
+          }
+
+          console.log('Processed message:', message);
         } else {
-          await bot.api.sendMessage(
-            Number(process.env.SUPPORT_CHATID),
-            `Возникла ошибка свзяанная с типом файла, вы можете отправить текст либо фото.`,
-          );
+          console.log('The message is not a reply.');
         }
-        console.log(message);
-      } catch (e) {
-        console.log(e);
-        await bot.api.sendMessage(Number(process.env.SUPPORT_CHATID), supportError);
       }
+    } catch (e) {
+      console.error('Error handling message:', e);
+      await bot.api.sendMessage(Number(process.env.SUPPORT_CHATID), supportError);
     }
   });
-
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   bot.start();
 }
