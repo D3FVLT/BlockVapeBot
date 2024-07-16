@@ -53,7 +53,10 @@ export function start() {
 
   bot.command('start', async ctx => {
     if (ctx.message?.chat.id == Number(process.env.SUPPORT_CHATID)) {
-      await bot.api.sendMessage(Number(process.env.SUPPORT_CHATID), 'Михан не трогай');
+      await bot.api.sendMessage(
+        Number(process.env.SUPPORT_CHATID),
+        `'Михан не трогай ${Number(process.env.SUPPORT_CHATID)}'`,
+      );
     } else {
       const userDB = await getUser(ctx.message?.from?.id || 0);
       if (!userDB) {
