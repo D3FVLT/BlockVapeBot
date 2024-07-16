@@ -206,7 +206,7 @@ ${message}`,
       console.log('Received message:', ctx.message);
 
       // Проверка ID чата
-      if (ctx.message.chat.id == Number(process.env.SUPPORT_CHATID)) {
+      if (ctx.update.message.chat.id == Number(process.env.SUPPORT_CHATID)) {
         console.log('Message is in the support chat.');
 
         let message;
