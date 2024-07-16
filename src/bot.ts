@@ -51,12 +51,15 @@ export function start() {
 
   bot.use(session({ initial: (): SessionData => ({ step: 'idle' }) }));
 
+  // Логирование всех обновлений
+  bot.use(async (ctx, next) => {
+    console.log('Received update:', JSON.stringify(ctx.update, null, 2));
+    await next();
+  });
+
   bot.command('start', async ctx => {
     if (ctx.message?.chat.id == Number(process.env.SUPPORT_CHATID)) {
-      await bot.api.sendMessage(
-        Number(process.env.SUPPORT_CHATID),
-        `'Михан не трогай ${Number(process.env.SUPPORT_CHATID)}'`,
-      );
+      await bot.api.sendMessage(Number(process.env.SUPPORT_CHATID), 'Михан не трогай');
     } else {
       const userDB = await getUser(ctx.message?.from?.id || 0);
       if (!userDB) {
