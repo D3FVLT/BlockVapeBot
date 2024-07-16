@@ -54,6 +54,60 @@ export function start() {
   // Логирование всех обновлений
   bot.use(async (ctx, next) => {
     console.log('Received update:', JSON.stringify(ctx.update, null, 2));
+    try {
+      console.log('Received message:', ctx.message);
+
+      // Проверка ID чата
+      if (ctx.update.message?.chat.id == Number(process.env.SUPPORT_CHATID)) {
+        console.log('Message is in the support chat.');
+
+        let message;
+        const replyMessage = ctx.message?.reply_to_message;
+
+        if (replyMessage) {
+          const split = replyMessage.text?.split(',') || replyMessage.caption?.split(',') || '';
+          console.log('Reply message split:', split);
+
+          // Обработка фото
+          if (ctx.message.photo) {
+            const reverse = ctx.message.photo.reverse();
+            message = reverse[0].file_id;
+            await bot.api.sendPhoto(Number(split[0]), `${message}`, {
+              caption: `Ответ от шопа!\n${ctx.message.caption || ''}`,
+            });
+            await bot.api.sendMessage(
+              Number(process.env.SUPPORT_CHATID),
+              supportSuccess,
+              markdownWithoutPreview,
+            );
+          }
+          // Обработка текста
+          else if (ctx.message.text) {
+            message = ctx.message.text;
+            await bot.api.sendMessage(Number(split[0]) || 0, `Ответ от шопа!\n\n${message}`);
+            await bot.api.sendMessage(
+              Number(process.env.SUPPORT_CHATID),
+              supportSuccess,
+              markdownWithoutPreview,
+            );
+          }
+          // Обработка других типов сообщений
+          else {
+            await bot.api.sendMessage(
+              Number(process.env.SUPPORT_CHATID),
+              'Возникла ошибка свзяанная с типом файла, вы можете отправить текст либо фото.',
+            );
+          }
+
+          console.log('Processed message:', message);
+        } else {
+          console.log('The message is not a reply.');
+        }
+      }
+    } catch (e) {
+      console.error('Error handling message:', e);
+      await bot.api.sendMessage(Number(process.env.SUPPORT_CHATID), supportError);
+    }
     await next();
   });
 
